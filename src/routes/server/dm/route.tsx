@@ -1,10 +1,13 @@
+import { useAuth } from '#/auth/AuthProvider'
 import { Button } from '#/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
 import { useTheme } from '#/hooks/useTheme'
@@ -51,6 +54,11 @@ const dmItems = [
 
 function RouteComponent() {
   const { toggleTheme, theme } = useTheme()
+  const { logout, user } = useAuth()
+
+  if (!user) {
+    return null
+  }
 
   return (
     <>
@@ -145,7 +153,7 @@ function RouteComponent() {
             </div>
             <div className="flex-1">
               <div className="text-sm text-slate-900 dark:text-white">
-                Farhan
+                {user.name}
               </div>
               <div className="text-xs text-slate-500 dark:text-white/50">
                 Online
@@ -184,6 +192,15 @@ function RouteComponent() {
                       Dark
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={async (event) => {
+                      event.preventDefault()
+                      await logout()
+                    }}
+                  >
+                    Log out
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

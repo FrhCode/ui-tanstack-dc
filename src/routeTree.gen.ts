@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ServerRouteRouteImport } from './routes/server/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ServerDmRouteRouteImport } from './routes/server/dm/route'
@@ -16,6 +18,16 @@ import { Route as ServerDmIndexRouteImport } from './routes/server/dm/index'
 import { Route as ServerDmFriendsRouteImport } from './routes/server/dm/friends'
 import { Route as ServerDmUserUserIdRouteImport } from './routes/server/dm/user/$userId'
 
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServerRouteRoute = ServerRouteRouteImport.update({
   id: '/server',
   path: '/server',
@@ -50,6 +62,8 @@ const ServerDmUserUserIdRoute = ServerDmUserUserIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/server': typeof ServerRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/server/dm': typeof ServerDmRouteRouteWithChildren
   '/server/dm/friends': typeof ServerDmFriendsRoute
   '/server/dm/': typeof ServerDmIndexRoute
@@ -58,6 +72,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/server': typeof ServerRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/server/dm/friends': typeof ServerDmFriendsRoute
   '/server/dm': typeof ServerDmIndexRoute
   '/server/dm/user/$userId': typeof ServerDmUserUserIdRoute
@@ -66,6 +82,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/server': typeof ServerRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/server/dm': typeof ServerDmRouteRouteWithChildren
   '/server/dm/friends': typeof ServerDmFriendsRoute
   '/server/dm/': typeof ServerDmIndexRoute
@@ -76,6 +94,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/server'
+    | '/login'
+    | '/register'
     | '/server/dm'
     | '/server/dm/friends'
     | '/server/dm/'
@@ -84,6 +104,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/server'
+    | '/login'
+    | '/register'
     | '/server/dm/friends'
     | '/server/dm'
     | '/server/dm/user/$userId'
@@ -91,6 +113,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/server'
+    | '/login'
+    | '/register'
     | '/server/dm'
     | '/server/dm/friends'
     | '/server/dm/'
@@ -100,10 +124,26 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ServerRouteRoute: typeof ServerRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/server': {
       id: '/server'
       path: '/server'
@@ -180,6 +220,8 @@ const ServerRouteRouteWithChildren = ServerRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ServerRouteRoute: ServerRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
