@@ -9,7 +9,6 @@ import { Link, useLocation } from '@tanstack/react-router'
 type ServerItem = {
   name: string
   badge: string
-  // active: boolean;
   key: string
 }
 

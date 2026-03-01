@@ -1,6 +1,15 @@
 import { Button } from '#/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '#/components/ui/dropdown-menu'
+import { useTheme } from '#/hooks/useTheme'
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
-import { Headphones, Mic, Settings } from 'lucide-react'
+import { Headphones, Mic, Moon, Settings, Sun } from 'lucide-react'
 
 export const Route = createFileRoute('/server/dm')({
   component: RouteComponent,
@@ -41,6 +50,8 @@ const dmItems = [
 ]
 
 function RouteComponent() {
+  const { toggleTheme, theme } = useTheme()
+
   return (
     <>
       <aside className="w-80 flex flex-col pb-4">
@@ -86,40 +97,6 @@ function RouteComponent() {
 
           <div className="mt-2 space-y-1">
             {dmItems.map((dm) => (
-              // <NavLink
-              //   to={dm.key}
-              //   key={dm.name}
-              //   className={({ isActive }) =>
-              //     `flex items-center gap-3 rounded-md px-2 py-2 ${
-              //       isActive
-              //         ? 'bg-slate-200 text-slate-900 dark:bg-white/10 dark:text-white'
-              //         : 'text-slate-500 hover:bg-slate-200 dark:text-white/60 dark:hover:bg-white/10'
-              //     }`
-              //   }
-              // >
-              //   <div className="relative">
-              //     <div className="h-9 w-9 rounded-full bg-slate-200 dark:bg-white/10" />
-              //     <span
-              //       className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ring-2 ring-white dark:ring-black ${
-              //         dm.status === 'online'
-              //           ? 'bg-green-500'
-              //           : dm.status === 'idle'
-              //             ? 'bg-yellow-500'
-              //             : dm.status === 'dnd'
-              //               ? 'bg-red-500'
-              //               : 'bg-gray-500'
-              //       }`}
-              //     />
-              //   </div>
-              //   <div className="flex-1 text-sm text-slate-700 dark:text-white/80">
-              //     {dm.name}
-              //   </div>
-              //   {dm.badge ? (
-              //     <div className="rounded bg-red-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
-              //       {dm.badge}
-              //     </div>
-              //   ) : null}
-              // </NavLink>
               <Link
                 to={dm.key}
                 key={dm.name}
@@ -181,9 +158,32 @@ function RouteComponent() {
               <button className="rounded p-1 hover:bg-slate-200 dark:hover:bg-white/10">
                 <Headphones className="h-4 w-4" />
               </button>
-              <button className="rounded p-1 hover:bg-slate-200 dark:hover:bg-white/10">
-                <Settings className="h-4 w-4" />
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded p-1 hover:bg-slate-200 dark:hover:bg-white/10">
+                    <Settings className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Theme</DropdownMenuLabel>
+                    <DropdownMenuCheckboxItem
+                      checked={theme === 'light'}
+                      onCheckedChange={() => toggleTheme('light')}
+                    >
+                      <Sun className="mr-2 h-4 w-4" />
+                      Light
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={theme === 'dark'}
+                      onCheckedChange={() => toggleTheme('dark')}
+                    >
+                      <Moon className="mr-2 h-4 w-4" />
+                      Dark
+                    </DropdownMenuCheckboxItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
