@@ -1,6 +1,6 @@
-const setItem = (key: string, value: string) => {
+const setItem = <T>(key: string, value: T) => {
   try {
-    localStorage.setItem(key, value)
+    localStorage.setItem(key, JSON.stringify(value))
   } catch (error) {
     console.error('Error setting item in localStorage:', error)
   }

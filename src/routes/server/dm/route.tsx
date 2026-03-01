@@ -170,6 +170,7 @@ function RouteComponent() {
                     <DropdownMenuCheckboxItem
                       checked={theme === 'light'}
                       onCheckedChange={() => toggleTheme('light')}
+                      onSelect={(event) => event.preventDefault()}
                     >
                       <Sun className="mr-2 h-4 w-4" />
                       Light
@@ -177,6 +178,7 @@ function RouteComponent() {
                     <DropdownMenuCheckboxItem
                       checked={theme === 'dark'}
                       onCheckedChange={() => toggleTheme('dark')}
+                      onSelect={(event) => event.preventDefault()}
                     >
                       <Moon className="mr-2 h-4 w-4" />
                       Dark

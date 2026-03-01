@@ -48,6 +48,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {\n  try {\n    const storedTheme = localStorage.getItem('theme')\n    if (!storedTheme) return\n    const theme = JSON.parse(storedTheme)\n    const html = document.documentElement\n    html.classList.toggle('dark', theme === 'dark')\n  } catch (_) {}\n})()`,
+          }}
+        />
       </head>
       <body>
         <TooltipProvider>
