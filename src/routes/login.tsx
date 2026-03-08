@@ -7,6 +7,7 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
+import { ApiError } from '#/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   createFileRoute,
@@ -34,15 +35,6 @@ function RouteComponent() {
     return <Navigate to="/server/dm" />
   }
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
-    try {
-      console.log(1)
-      await login({ email: data.email, password: data.password })
-      console.log(2)
-      await navigate({ to: '/server/dm' })
-    } catch (err) {}
-  }
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,6 +42,22 @@ function RouteComponent() {
       password: '',
     },
   })
+
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    try {
+      await login({ email: data.email, password: data.password })
+      await navigate({ to: '/server/dm' })
+    } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        form.setError('email', {
+          message: 'Invalid email or password',
+        })
+        form.setError('password', {
+          message: 'Invalid email or password',
+        })
+      }
+    }
+  }
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-10 dark:bg-black/30">

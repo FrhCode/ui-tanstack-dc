@@ -1,4 +1,4 @@
-import { fetchMe, isAuthenticated, login, logout, register } from '#/auth/auth'
+import authService from '#/auth/auth'
 import type { AuthUser, LoginPayload, RegisterPayload } from '#/types/auth'
 import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -20,18 +20,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   const loadUser = async () => {
-    if (!isAuthenticated()) {
+    if (!authService.isAuthenticated()) {
       setUser(null)
       setIsLoading(false)
       return
     }
 
     try {
-      const { data: me } = await fetchMe()
+      const me = await authService.fetchMe()
       setUser(me)
-    } catch {
-      setUser(null)
     } finally {
+      setUser(null)
       setIsLoading(false)
     }
   }
@@ -43,11 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     user,
     isLoading,
-    isAuthenticated: Boolean(user) || isAuthenticated(),
+    isAuthenticated: Boolean(user) || authService.isAuthenticated(),
     login: async (payload) => {
       try {
         setIsLoading(true)
-        await login(payload)
+        await authService.login(payload)
         await loadUser()
       } finally {
         setIsLoading(false)
@@ -56,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register: async (payload) => {
       try {
         setIsLoading(true)
-        await register(payload)
+        await authService.register(payload)
         await loadUser()
       } finally {
         setIsLoading(false)
@@ -64,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     logout: async () => {
       setIsLoading(true)
-      await logout()
+      await authService.logout()
       setUser(null)
       setIsLoading(false)
     },
