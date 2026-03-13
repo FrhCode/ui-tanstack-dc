@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     user,
     isLoading,
-    isAuthenticated: Boolean(user) || authService.isAuthenticated(),
+    isAuthenticated: Boolean(user),
     login: async (payload) => {
       try {
         setIsLoading(true)

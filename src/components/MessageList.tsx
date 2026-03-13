@@ -10,7 +10,7 @@ export function MessageList({ messages }: MessageListProps) {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView();
-  }, []);
+  }, [messages]);
 
   const reactions = ["💯", "👍", "👎", "😂", "😮", "😢", "🙏"];
 

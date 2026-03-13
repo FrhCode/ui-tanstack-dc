@@ -9,6 +9,7 @@ import {
 import { Input } from '#/components/ui/input'
 import { ApiError } from '#/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import {
   createFileRoute,
   Link,
@@ -30,6 +31,10 @@ export const Route = createFileRoute('/login')({
 function RouteComponent() {
   const { isAuthenticated, login, isLoading } = useAuth()
   const navigate = useNavigate()
+
+  if (isLoading) {
+    return <div className="h-screen" />
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/server/dm" />
@@ -55,6 +60,8 @@ function RouteComponent() {
         form.setError('password', {
           message: 'Invalid email or password',
         })
+      } else {
+        toast.error('Sign in failed. Please try again.')
       }
     }
   }

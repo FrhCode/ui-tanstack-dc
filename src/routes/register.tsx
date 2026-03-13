@@ -7,6 +7,7 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
+import { ApiError } from '#/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   createFileRoute,
@@ -15,6 +16,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router'
 import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 const formSchema = z.object({
@@ -35,6 +37,10 @@ export const Route = createFileRoute('/register')({
 function RouteComponent() {
   const { isAuthenticated, register, isLoading } = useAuth()
   const navigate = useNavigate()
+
+  if (isLoading) {
+    return <div className="h-screen" />
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/server/dm" />
@@ -59,7 +65,15 @@ function RouteComponent() {
         password: data.password,
       })
       await navigate({ to: '/server/dm' })
-    } catch (err) {}
+    } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 409) {
+        form.setError('email', { message: 'An account with this email already exists' })
+      } else if (err instanceof ApiError && err.statusCode === 422) {
+        form.setError('root', { message: err.message })
+      } else {
+        toast.error('Registration failed. Please try again.')
+      }
+    }
   }
 
   return (
@@ -113,8 +127,8 @@ function RouteComponent() {
                   <Input
                     {...field}
                     id="register-age"
-                    type="text"
-                    min={0}
+                    type="number"
+                    min={1}
                     max={150}
                     aria-invalid={fieldState.invalid}
                     autoComplete="off"

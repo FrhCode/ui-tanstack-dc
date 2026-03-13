@@ -13,6 +13,7 @@ import {
 import { useTheme } from '#/hooks/useTheme'
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
 import { Headphones, Mic, Moon, Settings, Sun } from 'lucide-react'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/server/dm')({
   component: RouteComponent,
@@ -54,7 +55,11 @@ const dmItems = [
 
 function RouteComponent() {
   const { toggleTheme, theme } = useTheme()
-  const { logout, user } = useAuth()
+  const { logout, user, isLoading } = useAuth()
+
+  if (isLoading) {
+    return <div className="h-screen" />
+  }
 
   if (!user) {
     return null
@@ -196,7 +201,11 @@ function RouteComponent() {
                   <DropdownMenuItem
                     onSelect={async (event) => {
                       event.preventDefault()
-                      await logout()
+                      try {
+                        await logout()
+                      } catch {
+                        toast.error('Logout failed. Please try again.')
+                      }
                     }}
                   >
                     Log out

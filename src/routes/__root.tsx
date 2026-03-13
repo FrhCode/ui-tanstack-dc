@@ -13,6 +13,7 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import appCss from '../styles.css?url'
 
 import { AuthProvider } from '#/auth/AuthProvider'
+import { ErrorBoundary } from '#/components/ErrorBoundary'
 import { TooltipProvider } from '#/components/ui/tooltip'
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -56,6 +57,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body>
+        <ErrorBoundary>
         <TooltipProvider>
           <TanStackQueryProvider>
             <AuthProvider>
@@ -75,6 +77,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </AuthProvider>
           </TanStackQueryProvider>
         </TooltipProvider>
+        </ErrorBoundary>
         <Scripts />
       </body>
     </html>

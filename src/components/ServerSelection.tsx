@@ -15,6 +15,7 @@ type ServerItem = {
 function ServerButton({ server }: { server: ServerItem }) {
   const location = useLocation()
   const path = location.pathname
+  const isActive = path === server.key || path.startsWith(server.key + '/')
 
   return (
     <Tooltip>
@@ -23,7 +24,7 @@ function ServerButton({ server }: { server: ServerItem }) {
           to={server.key}
           className={cn(
             'relative flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-200 text-xs text-slate-700 transition dark:bg-white/10 dark:text-white/90',
-            path.includes(server.key)
+            isActive
               ? 'rounded-xl bg-slate-300 dark:bg-white/20'
               : 'hover:rounded-xl',
           )}
@@ -35,7 +36,7 @@ function ServerButton({ server }: { server: ServerItem }) {
               {server.badge}
             </span>
           ) : null}
-          {path.includes(server.key) ? (
+          {isActive ? (
             <span className="absolute -left-2 top-0 h-full w-1 rounded-r-xl bg-slate-300 dark:bg-white/20" />
           ) : null}
         </Link>
