@@ -1,4 +1,4 @@
-import type { MessageListItem } from "@/types";
+import type { MessageListItem } from "#/types";
 import { useEffect, useRef } from "react";
 
 type MessageListProps = {
