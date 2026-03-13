@@ -29,8 +29,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const me = await authService.fetchMe()
       setUser(me)
-    } finally {
+    } catch {
       setUser(null)
+    } finally {
       setIsLoading(false)
     }
   }
