@@ -37,15 +37,6 @@ export const Route = createFileRoute('/register')({
 function RouteComponent() {
   const { isAuthenticated, register, isLoading } = useAuth()
   const navigate = useNavigate()
-
-  if (isLoading) {
-    return <div className="h-screen" />
-  }
-
-  if (isAuthenticated) {
-    return <Navigate to="/server/dm" />
-  }
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,6 +46,14 @@ function RouteComponent() {
       password: '',
     },
   })
+
+  if (isLoading) {
+    return <div className="h-screen" />
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/server/dm" />
+  }
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
