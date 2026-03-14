@@ -16,6 +16,7 @@ import { AuthProvider } from '#/auth/AuthProvider'
 import { ErrorBoundary } from '#/components/ErrorBoundary'
 import { TooltipProvider } from '#/components/ui/tooltip'
 import type { QueryClient } from '@tanstack/react-query'
+import { Toaster } from 'sonner'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -58,26 +59,27 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ErrorBoundary>
-        <TooltipProvider>
-          <TanStackQueryProvider>
-            <AuthProvider>
-              {children}
-              <TanStackDevtools
-                config={{
-                  position: 'bottom-right',
-                }}
-                plugins={[
-                  {
-                    name: 'Tanstack Router',
-                    render: <TanStackRouterDevtoolsPanel />,
-                  },
-                  TanStackQueryDevtools,
-                ]}
-              />
-            </AuthProvider>
-          </TanStackQueryProvider>
-        </TooltipProvider>
+          <TooltipProvider>
+            <TanStackQueryProvider>
+              <AuthProvider>
+                {children}
+                <TanStackDevtools
+                  config={{
+                    position: 'bottom-right',
+                  }}
+                  plugins={[
+                    {
+                      name: 'Tanstack Router',
+                      render: <TanStackRouterDevtoolsPanel />,
+                    },
+                    TanStackQueryDevtools,
+                  ]}
+                />
+              </AuthProvider>
+            </TanStackQueryProvider>
+          </TooltipProvider>
         </ErrorBoundary>
+        <Toaster />
         <Scripts />
       </body>
     </html>

@@ -14,9 +14,12 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ServerRouteRouteImport } from './routes/server/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ServerDmRouteRouteImport } from './routes/server/dm/route'
+import { Route as ServerServerIdRouteRouteImport } from './routes/server/$serverId/route'
 import { Route as ServerDmIndexRouteImport } from './routes/server/dm/index'
+import { Route as ServerServerIdIndexRouteImport } from './routes/server/$serverId/index'
 import { Route as ServerDmFriendsRouteImport } from './routes/server/dm/friends'
 import { Route as ServerDmUserUserIdRouteImport } from './routes/server/dm/user/$userId'
+import { Route as ServerServerIdChannelChannelIdRouteImport } from './routes/server/$serverId/channel/$channelId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -43,10 +46,20 @@ const ServerDmRouteRoute = ServerDmRouteRouteImport.update({
   path: '/dm',
   getParentRoute: () => ServerRouteRoute,
 } as any)
+const ServerServerIdRouteRoute = ServerServerIdRouteRouteImport.update({
+  id: '/$serverId',
+  path: '/$serverId',
+  getParentRoute: () => ServerRouteRoute,
+} as any)
 const ServerDmIndexRoute = ServerDmIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ServerDmRouteRoute,
+} as any)
+const ServerServerIdIndexRoute = ServerServerIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ServerServerIdRouteRoute,
 } as any)
 const ServerDmFriendsRoute = ServerDmFriendsRouteImport.update({
   id: '/friends',
@@ -58,15 +71,24 @@ const ServerDmUserUserIdRoute = ServerDmUserUserIdRouteImport.update({
   path: '/user/$userId',
   getParentRoute: () => ServerDmRouteRoute,
 } as any)
+const ServerServerIdChannelChannelIdRoute =
+  ServerServerIdChannelChannelIdRouteImport.update({
+    id: '/channel/$channelId',
+    path: '/channel/$channelId',
+    getParentRoute: () => ServerServerIdRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/server': typeof ServerRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/server/$serverId': typeof ServerServerIdRouteRouteWithChildren
   '/server/dm': typeof ServerDmRouteRouteWithChildren
   '/server/dm/friends': typeof ServerDmFriendsRoute
+  '/server/$serverId/': typeof ServerServerIdIndexRoute
   '/server/dm/': typeof ServerDmIndexRoute
+  '/server/$serverId/channel/$channelId': typeof ServerServerIdChannelChannelIdRoute
   '/server/dm/user/$userId': typeof ServerDmUserUserIdRoute
 }
 export interface FileRoutesByTo {
@@ -75,7 +97,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/server/dm/friends': typeof ServerDmFriendsRoute
+  '/server/$serverId': typeof ServerServerIdIndexRoute
   '/server/dm': typeof ServerDmIndexRoute
+  '/server/$serverId/channel/$channelId': typeof ServerServerIdChannelChannelIdRoute
   '/server/dm/user/$userId': typeof ServerDmUserUserIdRoute
 }
 export interface FileRoutesById {
@@ -84,9 +108,12 @@ export interface FileRoutesById {
   '/server': typeof ServerRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/server/$serverId': typeof ServerServerIdRouteRouteWithChildren
   '/server/dm': typeof ServerDmRouteRouteWithChildren
   '/server/dm/friends': typeof ServerDmFriendsRoute
+  '/server/$serverId/': typeof ServerServerIdIndexRoute
   '/server/dm/': typeof ServerDmIndexRoute
+  '/server/$serverId/channel/$channelId': typeof ServerServerIdChannelChannelIdRoute
   '/server/dm/user/$userId': typeof ServerDmUserUserIdRoute
 }
 export interface FileRouteTypes {
@@ -96,9 +123,12 @@ export interface FileRouteTypes {
     | '/server'
     | '/login'
     | '/register'
+    | '/server/$serverId'
     | '/server/dm'
     | '/server/dm/friends'
+    | '/server/$serverId/'
     | '/server/dm/'
+    | '/server/$serverId/channel/$channelId'
     | '/server/dm/user/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -107,7 +137,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/server/dm/friends'
+    | '/server/$serverId'
     | '/server/dm'
+    | '/server/$serverId/channel/$channelId'
     | '/server/dm/user/$userId'
   id:
     | '__root__'
@@ -115,9 +147,12 @@ export interface FileRouteTypes {
     | '/server'
     | '/login'
     | '/register'
+    | '/server/$serverId'
     | '/server/dm'
     | '/server/dm/friends'
+    | '/server/$serverId/'
     | '/server/dm/'
+    | '/server/$serverId/channel/$channelId'
     | '/server/dm/user/$userId'
   fileRoutesById: FileRoutesById
 }
@@ -165,12 +200,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServerDmRouteRouteImport
       parentRoute: typeof ServerRouteRoute
     }
+    '/server/$serverId': {
+      id: '/server/$serverId'
+      path: '/$serverId'
+      fullPath: '/server/$serverId'
+      preLoaderRoute: typeof ServerServerIdRouteRouteImport
+      parentRoute: typeof ServerRouteRoute
+    }
     '/server/dm/': {
       id: '/server/dm/'
       path: '/'
       fullPath: '/server/dm/'
       preLoaderRoute: typeof ServerDmIndexRouteImport
       parentRoute: typeof ServerDmRouteRoute
+    }
+    '/server/$serverId/': {
+      id: '/server/$serverId/'
+      path: '/'
+      fullPath: '/server/$serverId/'
+      preLoaderRoute: typeof ServerServerIdIndexRouteImport
+      parentRoute: typeof ServerServerIdRouteRoute
     }
     '/server/dm/friends': {
       id: '/server/dm/friends'
@@ -186,8 +235,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServerDmUserUserIdRouteImport
       parentRoute: typeof ServerDmRouteRoute
     }
+    '/server/$serverId/channel/$channelId': {
+      id: '/server/$serverId/channel/$channelId'
+      path: '/channel/$channelId'
+      fullPath: '/server/$serverId/channel/$channelId'
+      preLoaderRoute: typeof ServerServerIdChannelChannelIdRouteImport
+      parentRoute: typeof ServerServerIdRouteRoute
+    }
   }
 }
+
+interface ServerServerIdRouteRouteChildren {
+  ServerServerIdIndexRoute: typeof ServerServerIdIndexRoute
+  ServerServerIdChannelChannelIdRoute: typeof ServerServerIdChannelChannelIdRoute
+}
+
+const ServerServerIdRouteRouteChildren: ServerServerIdRouteRouteChildren = {
+  ServerServerIdIndexRoute: ServerServerIdIndexRoute,
+  ServerServerIdChannelChannelIdRoute: ServerServerIdChannelChannelIdRoute,
+}
+
+const ServerServerIdRouteRouteWithChildren =
+  ServerServerIdRouteRoute._addFileChildren(ServerServerIdRouteRouteChildren)
 
 interface ServerDmRouteRouteChildren {
   ServerDmFriendsRoute: typeof ServerDmFriendsRoute
@@ -206,10 +275,12 @@ const ServerDmRouteRouteWithChildren = ServerDmRouteRoute._addFileChildren(
 )
 
 interface ServerRouteRouteChildren {
+  ServerServerIdRouteRoute: typeof ServerServerIdRouteRouteWithChildren
   ServerDmRouteRoute: typeof ServerDmRouteRouteWithChildren
 }
 
 const ServerRouteRouteChildren: ServerRouteRouteChildren = {
+  ServerServerIdRouteRoute: ServerServerIdRouteRouteWithChildren,
   ServerDmRouteRoute: ServerDmRouteRouteWithChildren,
 }
 

@@ -61,7 +61,14 @@ npx shadcn@latest add <component>
 
 Config in `components.json`. Base color: zinc. All components use `data-slot` attributes and merge classes with `cn()`.
 
+**Always use shadcn primitives for form controls** — never use raw HTML elements when a shadcn equivalent exists:
+- `<Input>` from `src/components/ui/input.tsx` — never raw `<input>`
+- `<Textarea>` from `src/components/ui/textarea.tsx` — never raw `<textarea>`
+- `<Button>` from `src/components/ui/button.tsx` — prefer over raw `<button>` for primary actions
+
 ### Styling — Tailwind CSS v4
+
+**This app is desktop-first.** Do NOT use responsive prefixes (`sm:`, `md:`, `lg:`) as mobile-first breakpoints. Styles apply at all sizes by default; use breakpoint prefixes only when you explicitly need to override for smaller screens.
 
 Use `cn()` from `src/lib/utils.ts` (clsx + tailwind-merge) for all class merging. Dark mode via class strategy (`dark:` prefix). Theme CSS in `src/styles.css`.
 
