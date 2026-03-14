@@ -7,6 +7,12 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '#/components/ui/input-group'
 import { ApiError } from '#/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -15,6 +21,8 @@ import {
   Navigate,
   useNavigate,
 } from '@tanstack/react-router'
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -37,6 +45,7 @@ export const Route = createFileRoute('/register')({
 function RouteComponent() {
   const { isAuthenticated, register, isLoading } = useAuth()
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -170,14 +179,24 @@ function RouteComponent() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="register-password">Password</FieldLabel>
-                  <Input
-                    {...field}
-                    id="register-password"
-                    type="password"
-                    placeholder="Minimum 8 characters"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="new-password"
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      {...field}
+                      id="register-password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Minimum 8 characters"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="new-password"
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupButton
+                        onClick={() => setShowPassword((v) => !v)}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? <EyeOff /> : <Eye />}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

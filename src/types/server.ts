@@ -2,7 +2,7 @@ export type Server = {
   id: number
   name: string
   iconUrl: string | null
-  inviteCode: string
+  invite_code: string
   ownerId: number
   createdAt: string
   createdBy: string

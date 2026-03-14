@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog'
+import { Field, FieldLabel } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { useCreateServer, useJoinServer } from '#/hooks/useServerQueries'
 import { ApiError } from '#/lib/api'
@@ -196,10 +197,10 @@ function CreateMode({
             onChange={handleFileChange}
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <Field>
+          <FieldLabel className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Server Name <span className="text-destructive">*</span>
-          </label>
+          </FieldLabel>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -207,7 +208,7 @@ function CreateMode({
             maxLength={100}
             required
           />
-        </div>
+        </Field>
         <div className="flex gap-2">
           <Button
             type="button"
@@ -267,17 +268,17 @@ function JoinMode({
         <DialogTitle className="text-center text-xl">Join a Server</DialogTitle>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="mt-2 flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <Field>
+          <FieldLabel className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Invite Code <span className="text-destructive">*</span>
-          </label>
+          </FieldLabel>
           <Input
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value)}
             placeholder="Enter invite code"
             required
           />
-        </div>
+        </Field>
         <div className="flex gap-2">
           <Button
             type="button"

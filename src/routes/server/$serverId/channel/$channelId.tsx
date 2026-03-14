@@ -1,6 +1,7 @@
 import { useAuth } from '#/auth/AuthProvider'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
+import { Textarea } from '#/components/ui/textarea'
 import {
   useDeleteMessage,
   useEditMessage,
@@ -9,18 +10,12 @@ import {
 } from '#/hooks/useServerQueries'
 import { ApiError } from '#/lib/api'
 import type { Message } from '#/types'
-import {
-  createFileRoute,
-  useNavigate,
-  useParams,
-} from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
 import { Hash, Lock, Pencil, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute(
-  '/server/$serverId/channel/$channelId',
-)({
+export const Route = createFileRoute('/server/$serverId/channel/$channelId')({
   component: RouteComponent,
 })
 
@@ -53,7 +48,7 @@ function MessageItem({
   const editMessage = useEditMessage(channelId)
   const deleteMessage = useDeleteMessage(channelId)
 
-  async function handleEdit(e: { preventDefault(): void }) {
+  async function handleEdit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!editContent.trim() || editContent === message.content) {
       setEditing(false)
@@ -178,7 +173,7 @@ function MessageInput({ channelId }: { channelId: number }) {
     }
   }
 
-  function handleSubmit(e: { preventDefault(): void }) {
+  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     submit()
   }
@@ -193,7 +188,7 @@ function MessageInput({ channelId }: { channelId: number }) {
   return (
     <form onSubmit={handleSubmit} className="px-4 pb-6 pt-2">
       <div className="flex items-end gap-2 rounded-lg border-transparent bg-slate-100 px-4 py-2 dark:bg-white/[0.07]">
-        <textarea
+        <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -255,7 +250,11 @@ function RouteComponent() {
             You don&apos;t have permission to view this channel.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => navigate({ to: '/' })}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate({ to: '/' })}
+        >
           Go Home
         </Button>
       </div>

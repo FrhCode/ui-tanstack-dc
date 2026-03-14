@@ -46,11 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: Boolean(user),
     login: async (payload) => {
       try {
-        setIsLoading(true)
         await authService.login(payload)
         await loadUser()
       } finally {
-        setIsLoading(false)
       }
     },
     register: async (payload) => {

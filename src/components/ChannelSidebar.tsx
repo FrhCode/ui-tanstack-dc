@@ -23,6 +23,7 @@ import type { Channel } from '#/types'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import {
   ChevronDown,
+  Copy,
   Hash,
   Headphones,
   Mic,
@@ -157,9 +158,16 @@ export function ChannelSidebar() {
         <DropdownMenuContent className="w-56">
           {server && (
             <>
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Invite Code: {server.inviteCode}
-              </DropdownMenuLabel>
+                <DropdownMenuItem
+                onSelect={() => {
+                  navigator.clipboard.writeText(server.invite_code)
+                  toast.success('Invite code copied!')
+                }}
+                className="text-xs"
+              >
+                <Copy className="mr-2 h-3 w-3" />
+                Copy Invite Code
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
             </>
           )}
@@ -218,7 +226,9 @@ export function ChannelSidebar() {
           ) : isForbidden ? (
             <div className="flex flex-col items-center gap-2 px-2 py-4 text-center text-muted-foreground">
               <ShieldX className="h-6 w-6 opacity-40" />
-              <p className="text-xs">You don&apos;t have access to this server.</p>
+              <p className="text-xs">
+                You don&apos;t have access to this server.
+              </p>
             </div>
           ) : (
             server?.channels.map((channel) => (
