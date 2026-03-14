@@ -1,3 +1,4 @@
+import { ApiError } from '#/lib/api'
 import { serverService } from '#/services/server.service'
 import type {
   CreateChannelPayload,
@@ -35,6 +36,8 @@ export function useServer(id: number) {
     queryKey: serverKeys.detail(id),
     queryFn: () => serverService.getServer(id),
     enabled: !!id,
+    retry: (_, error) =>
+      !(error instanceof ApiError && error.statusCode === 403),
   })
 }
 
@@ -46,6 +49,8 @@ export function useMessages(channelId: number) {
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage: Message[]) =>
       lastPage.length > 0 ? lastPage[0].id : undefined,
+    retry: (_, error) =>
+      !(error instanceof ApiError && error.statusCode === 403),
     select: (data) => ({
       ...data,
       pages: [...data.pages].reverse(),

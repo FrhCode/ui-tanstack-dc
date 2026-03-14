@@ -51,8 +51,8 @@ export function ServerSelection() {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
-    <div className="h-screen bg-slate-100 text-slate-900 dark:bg-black/20 dark:text-white/90">
-      <div className="py-3 dark:border-white/10 dark:bg-black/40">
+    <div className="h-screen bg-slate-50 text-slate-900 dark:bg-black/30 dark:text-white/90">
+      <div className="py-3 dark:border-white/10">
         <div className="space-y-3 px-2">
           <ServerButton name="Direct Messages" linkKey="/server/dm" />
           <div className="mx-2 my-2 h-px bg-slate-300 dark:bg-white/10" />

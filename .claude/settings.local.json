@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep -r \"statusCode === 403\\\\|isError\\\\|useQuery.*error\\\\|invalidate\" --include=*.ts --include=*.tsx c:UsersFarhanDesktopprojectui-tanstack-dcsrc)"
     ]
   }
 }

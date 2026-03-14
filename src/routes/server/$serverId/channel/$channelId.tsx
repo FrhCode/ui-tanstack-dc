@@ -11,9 +11,10 @@ import { ApiError } from '#/lib/api'
 import type { Message } from '#/types'
 import {
   createFileRoute,
+  useNavigate,
   useParams,
 } from '@tanstack/react-router'
-import { Hash, Pencil, Trash2 } from 'lucide-react'
+import { Hash, Lock, Pencil, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -221,15 +222,45 @@ function RouteComponent() {
   })
   const channelId = Number(channelIdStr)
   const { user } = useAuth()
+  const navigate = useNavigate()
   const bottomRef = useRef<HTMLDivElement>(null)
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useMessages(channelId)
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useMessages(channelId)
 
   const allMessages = data?.pages.flatMap((page) => page) ?? []
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [allMessages.length])
+
+  const isForbidden =
+    isError && error instanceof ApiError && error.statusCode === 403
+
+  if (isForbidden) {
+    return (
+      <div className="flex h-full flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
+        <Lock className="h-12 w-12 opacity-30" />
+        <div className="text-center">
+          <p className="font-semibold text-slate-900 dark:text-white">
+            Access Denied
+          </p>
+          <p className="mt-1 text-sm">
+            You don&apos;t have permission to view this channel.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => navigate({ to: '/' })}>
+          Go Home
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden">

@@ -29,6 +29,7 @@ import {
   Moon,
   Plus,
   Settings,
+  ShieldX,
   Sun,
   Video,
 } from 'lucide-react'
@@ -112,7 +113,9 @@ export function ChannelSidebar() {
     serverId?: string
   }
   const serverId = Number(serverIdStr)
-  const { data: server, isLoading } = useServer(serverId)
+  const { data: server, isLoading, isError, error } = useServer(serverId)
+  const isForbidden =
+    isError && error instanceof ApiError && error.statusCode === 403
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
@@ -211,6 +214,11 @@ export function ChannelSidebar() {
                   className="h-8 animate-pulse rounded bg-slate-200 dark:bg-white/10"
                 />
               ))}
+            </div>
+          ) : isForbidden ? (
+            <div className="flex flex-col items-center gap-2 px-2 py-4 text-center text-muted-foreground">
+              <ShieldX className="h-6 w-6 opacity-40" />
+              <p className="text-xs">You don&apos;t have access to this server.</p>
             </div>
           ) : (
             server?.channels.map((channel) => (
