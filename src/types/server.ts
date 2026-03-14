@@ -1,9 +1,9 @@
 export type Server = {
   id: number
   name: string
-  iconUrl: string | null
+  icon_url: string | null
   invite_code: string
-  ownerId: number
+  owner_id: number
   createdAt: string
   createdBy: string
   modifiedAt: string

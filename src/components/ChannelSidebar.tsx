@@ -193,7 +193,7 @@ export function ChannelSidebar() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="flex w-full justify-between rounded-none border-b border-border px-4 py-3 font-semibold"
+            className="flex h-12 w-full justify-between rounded-none border-b border-border px-4 font-semibold"
           >
             <span className="truncate">
               {isLoading ? '...' : (server?.name ?? 'Server')}

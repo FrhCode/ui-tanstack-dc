@@ -12,9 +12,11 @@ import { CreateServerDialog } from './CreateServerDialog'
 function ServerButton({
   name,
   linkKey,
+  iconUrl,
 }: {
   name: string
   linkKey: string
+  iconUrl: string | null
 }) {
   const location = useLocation()
   const path = location.pathname
@@ -33,7 +35,15 @@ function ServerButton({
           )}
           aria-label={name}
         >
-          {name[0].toUpperCase()}
+          {iconUrl ? (
+            <img
+              src={import.meta.env.VITE_API_BASE_URL + iconUrl}
+              alt={name}
+              className="h-full w-full rounded-[inherit] object-cover"
+            />
+          ) : (
+            name[0].toUpperCase()
+          )}
           {isActive ? (
             <span className="absolute -left-2 top-0 h-full w-1 rounded-r-xl bg-slate-300 dark:bg-white/20" />
           ) : null}
@@ -54,7 +64,11 @@ export function ServerSelection() {
     <div className="h-screen bg-slate-50 text-slate-900 dark:bg-black/30 dark:text-white/90">
       <div className="py-3 dark:border-white/10">
         <div className="space-y-3 px-2">
-          <ServerButton name="Direct Messages" linkKey="/server/dm" />
+          <ServerButton
+            name="Direct Messages"
+            linkKey="/server/dm"
+            iconUrl={null}
+          />
           <div className="mx-2 my-2 h-px bg-slate-300 dark:bg-white/10" />
 
           {isLoading ? (
@@ -72,6 +86,7 @@ export function ServerSelection() {
                 key={server.id}
                 name={server.name}
                 linkKey={`/server/${server.id}`}
+                iconUrl={server.icon_url}
               />
             ))
           )}

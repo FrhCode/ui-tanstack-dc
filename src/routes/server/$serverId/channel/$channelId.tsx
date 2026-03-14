@@ -9,9 +9,10 @@ import {
   useSendMessage,
 } from '#/hooks/useServerQueries'
 import { ApiError } from '#/lib/api'
+import { cn } from '#/lib/utils'
 import type { Message } from '#/types'
 import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
-import { Hash, Lock, Pencil, Trash2 } from 'lucide-react'
+import { Hash, Lock, Pencil, Plus, SendHorizonal, Smile, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -156,13 +157,25 @@ function MessageItem({
   )
 }
 
+const MAX_LENGTH = 2000
+
 function MessageInput({ channelId }: { channelId: number }) {
   const [content, setContent] = useState('')
+  const [focused, setFocused] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const sendMessage = useSendMessage(channelId)
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`
+  }, [content])
 
   async function submit() {
     const trimmed = content.trim()
-    if (!trimmed) return
+    if (!trimmed || sendMessage.isPending) return
     setContent('')
     try {
       await sendMessage.mutateAsync({ content: trimmed })
@@ -173,7 +186,7 @@ function MessageInput({ channelId }: { channelId: number }) {
     }
   }
 
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     submit()
   }
@@ -185,27 +198,90 @@ function MessageInput({ channelId }: { channelId: number }) {
     }
   }
 
+  const charCount = content.length
+  const nearLimit = charCount > MAX_LENGTH * 0.85
+
   return (
-    <form onSubmit={handleSubmit} className="px-4 pb-6 pt-2">
-      <div className="flex items-end gap-2 rounded-lg border-transparent bg-slate-100 px-4 py-2 dark:bg-white/[0.07]">
-        <Textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Send a message..."
-          rows={1}
-          maxLength={2000}
-          className="flex-1 resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          style={{ maxHeight: '120px' }}
-        />
-        <Button
-          type="submit"
-          size="sm"
-          disabled={sendMessage.isPending || !content.trim()}
-          variant={content.trim() ? 'default' : 'ghost'}
-        >
-          Send
-        </Button>
+    <form onSubmit={handleSubmit} className="px-4 pb-5 pt-2">
+      <div
+        className={cn(
+          'relative rounded-xl border bg-slate-100 transition-all dark:bg-white/6',
+          focused
+            ? 'border-slate-300 dark:border-white/20'
+            : 'border-transparent',
+        )}
+      >
+        {/* Top row: attach + textarea */}
+        <div className="flex items-end gap-1 px-2 pt-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="mb-1 shrink-0 text-muted-foreground hover:text-foreground"
+            aria-label="Attach file"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+
+          <Textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder="Send a message…"
+            rows={1}
+            maxLength={MAX_LENGTH}
+            className="flex-1 resize-none border-none bg-transparent py-1.5 text-sm shadow-none outline-none ring-0 focus-visible:ring-0 placeholder:text-muted-foreground/60"
+            style={{ maxHeight: '160px' }}
+          />
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="mb-1 shrink-0 text-muted-foreground hover:text-foreground"
+            aria-label="Emoji"
+          >
+            <Smile className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex items-center justify-between px-3 pb-2 pt-1">
+          <p className="text-xs text-muted-foreground/50">
+            Shift + Enter for new line
+          </p>
+          <div className="flex items-center gap-2">
+            {nearLimit && (
+              <span
+                className={cn(
+                  'text-xs tabular-nums',
+                  charCount >= MAX_LENGTH
+                    ? 'text-red-500'
+                    : 'text-yellow-500',
+                )}
+              >
+                {MAX_LENGTH - charCount}
+              </span>
+            )}
+            <Button
+              type="submit"
+              size="icon-sm"
+              disabled={sendMessage.isPending || !content.trim()}
+              className={cn(
+                'h-7 w-7 transition-all',
+                content.trim()
+                  ? 'opacity-100'
+                  : 'opacity-40',
+              )}
+              aria-label="Send message"
+            >
+              <SendHorizonal className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
       </div>
     </form>
   )
@@ -264,7 +340,7 @@ function RouteComponent() {
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden bg-white text-slate-900 dark:bg-black/20 dark:text-white/90">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-3 dark:border-white/10">
+      <div className="flex h-12 shrink-0 items-center gap-2 border-b border-border px-4">
         <Hash className="h-5 w-5 text-muted-foreground" />
         <span className="font-semibold">channel</span>
       </div>

@@ -14,6 +14,7 @@ function RouteComponent() {
       <main className="flex flex-1 overflow-hidden">
         <Outlet />
       </main>
+
       <MemberSidebar serverId={Number(serverId)} />
     </>
   )

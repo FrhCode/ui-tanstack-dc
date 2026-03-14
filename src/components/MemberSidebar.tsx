@@ -235,14 +235,14 @@ export function MemberSidebar({ serverId }: { serverId: number }) {
   const { data: members, isLoading } = useMembers(serverId)
 
   const currentMember = members?.find((m) => m.user_id === user?.id)
-  const currentUserIsOwner = server?.ownerId === user?.id
+  const currentUserIsOwner = server?.owner_id === user?.id
   const currentUserIsAdmin =
     currentUserIsOwner || currentMember?.role === 'admin'
 
   const sorted = members
     ? [...members].sort((a, b) => {
         const rank = (m: Member) => {
-          if (m.user_id === server?.ownerId) return 0
+          if (m.user_id === server?.owner_id) return 0
           if (m.role === 'admin') return 1
           return 2
         }
@@ -251,8 +251,8 @@ export function MemberSidebar({ serverId }: { serverId: number }) {
     : []
 
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col bg-slate-50 dark:bg-black/20">
-      <div className="border-b border-border px-4 py-3">
+    <aside className="flex h-screen w-60 shrink-0 flex-col bg-slate-50 dark:bg-black/20 lg:hidden">
+      <div className="flex h-12 shrink-0 items-center border-b border-border px-4">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Members{members ? ` — ${members.length}` : ''}
         </h3>
@@ -273,7 +273,7 @@ export function MemberSidebar({ serverId }: { serverId: number }) {
             <MemberRow
               key={member.id}
               member={member}
-              isOwner={member.user_id === server?.ownerId}
+              isOwner={member.user_id === server?.owner_id}
               currentUserIsOwner={currentUserIsOwner}
               currentUserIsAdmin={currentUserIsAdmin}
               serverId={serverId}
