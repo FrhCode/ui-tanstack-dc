@@ -16,6 +16,16 @@ export const serverService = {
 
   getServer: (id: number) => request<ServerWithChannels>(`/servers/${id}`),
 
+  uploadFile: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return request<{ url: string }>('/upload/image', {
+      method: 'POST',
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+
   createServer: (payload: CreateServerPayload) =>
     request<Server>('/servers', { method: 'POST', data: payload }),
 

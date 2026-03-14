@@ -1,3 +1,4 @@
+import { Button } from '#/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -5,11 +6,12 @@ import {
   DialogTitle,
 } from '#/components/ui/dialog'
 import { Input } from '#/components/ui/input'
-import { Button } from '#/components/ui/button'
 import { useCreateServer, useJoinServer } from '#/hooks/useServerQueries'
 import { ApiError } from '#/lib/api'
+import { serverService } from '#/services/server.service'
 import { useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { ImagePlus } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 type Mode = 'pick' | 'create' | 'join'
@@ -107,7 +109,31 @@ function CreateMode({
   onSuccess: (serverId: number) => void
 }) {
   const [name, setName] = useState('')
-  const [iconUrl, setIconUrl] = useState('')
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPreviewUrl(URL.createObjectURL(file))
+    setUploadedUrl(null)
+    setIsUploading(true)
+    try {
+      const resp = await serverService.uploadFile(file)
+      setUploadedUrl(resp.url)
+    } catch (err) {
+      setPreviewUrl(null)
+      if (err instanceof ApiError) {
+        toast.error(err.message)
+      } else {
+        toast.error('Failed to upload image')
+      }
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -115,7 +141,7 @@ function CreateMode({
     try {
       const server = await mutation.mutateAsync({
         name: name.trim(),
-        ...(iconUrl.trim() ? { iconUrl: iconUrl.trim() } : {}),
+        ...(uploadedUrl ? { iconUrl: uploadedUrl } : {}),
       })
       toast.success(`Server "${server.name}" created!`)
       onSuccess(server.id)
@@ -128,6 +154,13 @@ function CreateMode({
     }
   }
 
+  const isPending = isUploading || mutation.isPending
+  const buttonLabel = isUploading
+    ? 'Uploading...'
+    : mutation.isPending
+      ? 'Creating...'
+      : 'Create'
+
   return (
     <>
       <DialogHeader>
@@ -136,6 +169,33 @@ function CreateMode({
         </DialogTitle>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="mt-2 flex flex-col gap-4">
+        <div className="flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="group relative flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted transition-colors hover:border-primary hover:bg-muted/80"
+          >
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Server icon preview"
+                className="size-full object-cover"
+              />
+            ) : (
+              <ImagePlus className="size-8 text-muted-foreground group-hover:text-primary" />
+            )}
+          </button>
+          <span className="text-xs text-muted-foreground">
+            {previewUrl ? 'Icon selected' : 'Click to upload icon (optional)'}
+          </span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Server Name <span className="text-destructive">*</span>
@@ -148,32 +208,22 @@ function CreateMode({
             required
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Icon URL (optional)
-          </label>
-          <Input
-            value={iconUrl}
-            onChange={(e) => setIconUrl(e.target.value)}
-            placeholder="https://example.com/icon.png"
-            type="url"
-          />
-        </div>
         <div className="flex gap-2">
           <Button
             type="button"
             variant="outline"
             onClick={onBack}
             className="flex-1"
+            disabled={isPending}
           >
             Back
           </Button>
           <Button
             type="submit"
-            disabled={mutation.isPending || !name.trim()}
+            disabled={isPending || !name.trim()}
             className="flex-1"
           >
-            {mutation.isPending ? 'Creating...' : 'Create'}
+            {buttonLabel}
           </Button>
         </div>
       </form>
@@ -214,9 +264,7 @@ function JoinMode({
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-center text-xl">
-          Join a Server
-        </DialogTitle>
+        <DialogTitle className="text-center text-xl">Join a Server</DialogTitle>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="mt-2 flex flex-col gap-4">
         <div className="flex flex-col gap-1">
