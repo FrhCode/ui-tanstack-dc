@@ -24,10 +24,11 @@ export type Channel = {
 export type Message = {
   id: number
   content: string
-  channelId: number
-  senderId: number
-  createdAt: string
-  modifiedAt: string
+  channel_id: number
+  sender_id: number
+  sender_name: string
+  created_at: string
+  modified_at: string
 }
 
 export type Member = {

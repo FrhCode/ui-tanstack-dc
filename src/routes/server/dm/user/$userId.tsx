@@ -776,22 +776,26 @@ function RouteComponent() {
         <div className="flex-1 flex flex-col px-4 py-6">
           <MessageList messages={messages} />
 
-          <div className="border-white/10 p-4 pb-0">
-            <InputGroup>
-              <InputGroupAddon>+</InputGroupAddon>
+          <div className="px-4 pb-6 pt-2">
+            <InputGroup className="bg-slate-100 dark:bg-white/[0.07] border-transparent rounded-lg shadow-none h-11">
+              <InputGroupAddon>
+                <button className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-400/30 hover:bg-slate-400/50 dark:bg-white/20 dark:hover:bg-white/30 text-slate-600 dark:text-white/70 text-lg font-light leading-none">
+                  +
+                </button>
+              </InputGroupAddon>
               <InputGroupInput
                 placeholder="Message @farhanbantulm1"
-                className="rounded-md border-slate-200 text-sm text-slate-500 dark:border-white/10 dark:text-white/50"
+                className="text-sm placeholder:text-slate-400 dark:placeholder:text-white/30 text-slate-900 dark:text-white"
               />
               <InputGroupAddon align="inline-end">
-                <div className="flex items-center gap-3 text-slate-400 dark:text-white/40">
-                  <button className="rounded p-1 hover:bg-slate-300 dark:hover:bg-white/10">
+                <div className="flex items-center gap-1 text-slate-400 dark:text-white/40">
+                  <button className="flex h-7 w-7 items-center justify-center rounded hover:bg-slate-200 dark:hover:bg-white/10 text-base">
                     🎁
                   </button>
-                  <button className="rounded p-1 hover:bg-slate-300 dark:hover:bg-white/10">
+                  <button className="flex h-7 w-7 items-center justify-center rounded hover:bg-slate-200 dark:hover:bg-white/10 text-sm font-semibold">
                     GIF
                   </button>
-                  <button className="rounded p-1 hover:bg-slate-300 dark:hover:bg-white/10">
+                  <button className="flex h-7 w-7 items-center justify-center rounded hover:bg-slate-200 dark:hover:bg-white/10 text-base">
                     😊
                   </button>
                 </div>

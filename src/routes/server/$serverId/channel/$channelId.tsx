@@ -83,12 +83,12 @@ function MessageItem({
       <div className="flex-1 overflow-hidden">
         <div className="flex items-baseline gap-2">
           <span className="text-sm font-semibold text-slate-900 dark:text-white">
-            User #{message.senderId}
+            {message.sender_name}
           </span>
           <span className="text-xs text-slate-400 dark:text-white/40">
-            {formatTime(message.createdAt)}
+            {formatTime(message.created_at)}
           </span>
-          {message.modifiedAt !== message.createdAt && (
+          {message.modified_at !== message.created_at && (
             <span className="text-xs text-slate-400 dark:text-white/30">
               (edited)
             </span>
@@ -192,7 +192,7 @@ function MessageInput({ channelId }: { channelId: number }) {
 
   return (
     <form onSubmit={handleSubmit} className="px-4 pb-6 pt-2">
-      <div className="flex items-end gap-2 rounded-lg border border-border bg-slate-100 px-4 py-2 dark:bg-white/5">
+      <div className="flex items-end gap-2 rounded-lg border-transparent bg-slate-100 px-4 py-2 dark:bg-white/[0.07]">
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -263,9 +263,9 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex h-full flex-1 flex-col overflow-hidden">
+    <div className="flex h-full flex-1 flex-col overflow-hidden bg-white text-slate-900 dark:bg-black/20 dark:text-white/90">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+      <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-3 dark:border-white/10">
         <Hash className="h-5 w-5 text-muted-foreground" />
         <span className="font-semibold">channel</span>
       </div>
@@ -300,7 +300,7 @@ function RouteComponent() {
             {(() => {
               let lastDate = ''
               return allMessages.map((msg) => {
-                const dateLabel = formatDate(msg.createdAt)
+                const dateLabel = formatDate(msg.created_at)
                 const showDate = dateLabel !== lastDate
                 lastDate = dateLabel
                 return (
@@ -316,7 +316,7 @@ function RouteComponent() {
                     )}
                     <MessageItem
                       message={msg}
-                      isOwn={msg.senderId === user?.id}
+                      isOwn={msg.sender_id === user?.id}
                       channelId={channelId}
                     />
                   </div>

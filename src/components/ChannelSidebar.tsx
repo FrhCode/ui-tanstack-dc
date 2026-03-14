@@ -140,7 +140,7 @@ export function ChannelSidebar() {
   const canManage = isOwner
 
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col border-r bg-slate-50 dark:bg-black/30">
+    <aside className="flex h-screen w-80 shrink-0 flex-col bg-slate-50 dark:bg-black/30">
       {/* Server header */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -241,32 +241,34 @@ export function ChannelSidebar() {
 
       {/* User panel */}
       {user && (
-        <div className="border-t border-border p-3">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="h-9 w-9 rounded-full bg-slate-200 dark:bg-white/10" />
+        <div className="mx-1 rounded-lg px-2 py-2 transition-colors hover:bg-slate-200 dark:hover:bg-white/10">
+          <div className="flex items-center gap-2">
+            <div className="relative shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-xs font-bold text-white">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
               <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white dark:ring-black" />
             </div>
-            <div className="flex-1 overflow-hidden">
-              <div className="truncate text-sm text-slate-900 dark:text-white">
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-semibold text-slate-900 dark:text-white">
                 {user.name}
               </div>
-              <div className="text-xs text-slate-500 dark:text-white/50">
-                Online
+              <div className="truncate text-xs text-slate-500 dark:text-white/50">
+                {user.email}
               </div>
             </div>
-            <div className="flex items-center gap-0.5">
-              <Button variant="ghost" size="icon-sm">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-white/60">
+              <button className="rounded p-1 hover:bg-slate-200 dark:hover:bg-white/10">
                 <Mic className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon-sm">
+              </button>
+              <button className="rounded p-1 hover:bg-slate-200 dark:hover:bg-white/10">
                 <Headphones className="h-4 w-4" />
-              </Button>
+              </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm">
+                  <button className="rounded p-1 hover:bg-slate-200 dark:hover:bg-white/10">
                     <Settings className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48">
                   <DropdownMenuGroup>

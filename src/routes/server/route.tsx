@@ -18,7 +18,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="flex h-screen overflow-y-hidden">
+    <div className="flex h-screen overflow-hidden min-w-212.5">
       <aside className="w-16 shrink-0 border-r bg-slate-50 dark:bg-black/30">
         <ServerSelection />
       </aside>
