@@ -4,8 +4,11 @@ import type {
   CreateChannelPayload,
   CreateServerPayload,
   JoinServerPayload,
+  Member,
   Message,
+  RenameChannelPayload,
   SendMessagePayload,
+  UpdateMemberRolePayload,
 } from '#/types'
 import {
   useInfiniteQuery,
@@ -19,6 +22,7 @@ import {
 export const serverKeys = {
   all: ['servers'] as const,
   detail: (id: number) => ['servers', id] as const,
+  members: (serverId: number) => ['servers', serverId, 'members'] as const,
   messages: (channelId: number) => ['messages', channelId] as const,
 }
 
@@ -150,6 +154,69 @@ export function useDeleteMessage(channelId: number) {
       queryClient.invalidateQueries({
         queryKey: serverKeys.messages(channelId),
       })
+    },
+  })
+}
+
+export function useMembers(serverId: number) {
+  return useQuery({
+    queryKey: serverKeys.members(serverId),
+    queryFn: () => serverService.getMembers(serverId),
+    enabled: !!serverId,
+  })
+}
+
+export function useTransferOwnership(serverId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (userId: number) =>
+      serverService.transferOwnership(serverId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: serverKeys.all })
+      queryClient.invalidateQueries({ queryKey: serverKeys.detail(serverId) })
+      queryClient.invalidateQueries({ queryKey: serverKeys.members(serverId) })
+    },
+  })
+}
+
+export function useUpdateMemberRole(serverId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      userId,
+      payload,
+    }: {
+      userId: number
+      payload: UpdateMemberRolePayload
+    }) => serverService.updateMemberRole(serverId, userId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: serverKeys.members(serverId) })
+    },
+  })
+}
+
+export function useKickMember(serverId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (userId: number) => serverService.kickMember(serverId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: serverKeys.members(serverId) })
+    },
+  })
+}
+
+export function useRenameChannel(serverId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      channelId,
+      payload,
+    }: {
+      channelId: number
+      payload: RenameChannelPayload
+    }) => serverService.renameChannel(serverId, channelId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: serverKeys.detail(serverId) })
     },
   })
 }

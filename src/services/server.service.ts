@@ -6,9 +6,11 @@ import type {
   JoinServerPayload,
   Member,
   Message,
+  RenameChannelPayload,
   SendMessagePayload,
   Server,
   ServerWithChannels,
+  UpdateMemberRolePayload,
 } from '#/types'
 
 export const serverService = {
@@ -91,4 +93,35 @@ export const serverService = {
       `/channels/${channelId}/messages/${messageId}`,
       { method: 'DELETE' },
     ),
+
+  transferOwnership: (serverId: number, userId: number) =>
+    request<{ success: boolean }>(`/servers/${serverId}/transfer`, {
+      method: 'PATCH',
+      data: { userId },
+    }),
+
+  updateMemberRole: (
+    serverId: number,
+    userId: number,
+    payload: UpdateMemberRolePayload,
+  ) =>
+    request<{ success: boolean }>(`/servers/${serverId}/members/${userId}`, {
+      method: 'PATCH',
+      data: payload,
+    }),
+
+  kickMember: (serverId: number, userId: number) =>
+    request<{ success: boolean }>(`/servers/${serverId}/members/${userId}`, {
+      method: 'DELETE',
+    }),
+
+  renameChannel: (
+    serverId: number,
+    channelId: number,
+    payload: RenameChannelPayload,
+  ) =>
+    request<Channel>(`/servers/${serverId}/channels/${channelId}`, {
+      method: 'PATCH',
+      data: payload,
+    }),
 }

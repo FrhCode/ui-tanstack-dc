@@ -13,7 +13,10 @@ import {
 import { Input } from '#/components/ui/input'
 import {
   useCreateChannel,
+  useDeleteChannel,
   useLeaveServer,
+  useMembers,
+  useRenameChannel,
   useServer,
 } from '#/hooks/useServerQueries'
 import { useTheme } from '#/hooks/useTheme'
@@ -28,13 +31,16 @@ import {
   Headphones,
   Mic,
   Moon,
+  MoreVertical,
+  Pencil,
   Plus,
   Settings,
   ShieldX,
   Sun,
+  Trash2,
   Video,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 function ChannelIcon({ type }: { type: Channel['type'] }) {
@@ -121,7 +127,13 @@ export function ChannelSidebar() {
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const leaveServer = useLeaveServer()
+  const deleteChannel = useDeleteChannel(serverId)
+  const renameChannel = useRenameChannel(serverId)
+  const { data: members } = useMembers(serverId)
   const [showCreateChannel, setShowCreateChannel] = useState(false)
+  const [editingChannelId, setEditingChannelId] = useState<number | null>(null)
+  const [editName, setEditName] = useState('')
+  const renameInputRef = useRef<HTMLInputElement>(null)
 
   const channelPath = (channelId: number) =>
     `/server/${serverId}/channel/${channelId}`
@@ -137,8 +149,42 @@ export function ChannelSidebar() {
     }
   }
 
+  function startRename(channelId: number, currentName: string) {
+    setEditingChannelId(channelId)
+    setEditName(currentName)
+    setTimeout(() => renameInputRef.current?.focus(), 0)
+  }
+
+  async function submitRename(channelId: number) {
+    const trimmed = editName.trim()
+    if (!trimmed) {
+      setEditingChannelId(null)
+      return
+    }
+    try {
+      await renameChannel.mutateAsync({ channelId, payload: { name: trimmed } })
+      toast.success('Channel renamed')
+    } catch (err) {
+      if (err instanceof ApiError) toast.error(err.message)
+      else toast.error('Failed to rename channel')
+    } finally {
+      setEditingChannelId(null)
+    }
+  }
+
+  async function handleDeleteChannel(channelId: number, channelName: string) {
+    try {
+      await deleteChannel.mutateAsync(channelId)
+      toast.success(`#${channelName} deleted`)
+    } catch (err) {
+      if (err instanceof ApiError) toast.error(err.message)
+      else toast.error('Failed to delete channel')
+    }
+  }
+
   const isOwner = server?.ownerId === user?.id
-  const canManage = isOwner
+  const currentMember = members?.find((m) => m.userId === user?.id)
+  const canManage = isOwner || currentMember?.role === 'admin'
 
   return (
     <aside className="flex h-screen w-80 shrink-0 flex-col bg-slate-50 dark:bg-black/30">
@@ -232,18 +278,68 @@ export function ChannelSidebar() {
             </div>
           ) : (
             server?.channels.map((channel) => (
-              <Link
-                key={channel.id}
-                to={channelPath(channel.id)}
-                className={cn(
-                  'flex items-center gap-2 rounded px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-200 hover:text-slate-900 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white',
-                  '[&.active]:bg-slate-200 [&.active]:text-slate-900 dark:[&.active]:bg-white/10 dark:[&.active]:text-white',
+              <div key={channel.id} className="group relative">
+                {editingChannelId === channel.id ? (
+                  <div className="flex items-center gap-1 px-2 py-1">
+                    <ChannelIcon type={channel.type} />
+                    <Input
+                      ref={renameInputRef}
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') submitRename(channel.id)
+                        if (e.key === 'Escape') setEditingChannelId(null)
+                      }}
+                      onBlur={() => submitRename(channel.id)}
+                      className="h-6 flex-1 px-1 text-xs"
+                      maxLength={100}
+                    />
+                  </div>
+                ) : (
+                  <Link
+                    to={channelPath(channel.id)}
+                    className={cn(
+                      'flex items-center gap-2 rounded px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-200 hover:text-slate-900 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white',
+                      '[&.active]:bg-slate-200 [&.active]:text-slate-900 dark:[&.active]:bg-white/10 dark:[&.active]:text-white',
+                    )}
+                    activeProps={{ className: 'active' }}
+                  >
+                    <ChannelIcon type={channel.type} />
+                    <span className="flex-1 truncate">{channel.name}</span>
+                    {canManage && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          asChild
+                          onClick={(e) => e.preventDefault()}
+                        >
+                          <span className="ml-auto rounded p-0.5 opacity-0 transition-opacity hover:bg-slate-300 group-hover:opacity-100 dark:hover:bg-white/20">
+                            <MoreVertical className="h-3 w-3" />
+                          </span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem
+                            onSelect={() =>
+                              startRename(channel.id, channel.name)
+                            }
+                          >
+                            <Pencil className="mr-2 h-3.5 w-3.5" />
+                            Rename
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() =>
+                              handleDeleteChannel(channel.id, channel.name)
+                            }
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-3.5 w-3.5" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </Link>
                 )}
-                activeProps={{ className: 'active' }}
-              >
-                <ChannelIcon type={channel.type} />
-                <span className="truncate">{channel.name}</span>
-              </Link>
+              </div>
             ))
           )}
         </div>

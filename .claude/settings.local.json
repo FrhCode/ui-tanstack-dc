@@ -4,7 +4,9 @@
       "Bash(npm run:*)",
       "Bash(grep -r \"statusCode === 403\\\\|isError\\\\|useQuery.*error\\\\|invalidate\" --include=*.ts --include=*.tsx c:UsersFarhanDesktopprojectui-tanstack-dcsrc)",
       "Bash(grep -E \"\\\\.tsx$\")",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

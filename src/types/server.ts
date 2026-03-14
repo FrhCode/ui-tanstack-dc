@@ -33,11 +33,15 @@ export type Message = {
 
 export type Member = {
   id: number
-  userId: number
+  user_id: number
   serverId: number
   role: 'admin' | 'member'
   createdAt: string
+  username?: string
 }
+
+export type UpdateMemberRolePayload = { role: 'admin' | 'member' }
+export type RenameChannelPayload = { name: string }
 
 export type ServerWithChannels = Server & { channels: Channel[] }
 
