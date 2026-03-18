@@ -47,6 +47,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* custom */
+  --animate-message-highlight: message-highlight 1.5s ease-in-out;
   /* --color-frh-surface: var(--frh-surface);
   --color-frh-text-surface: var(--frh-text-surface);
 
@@ -148,6 +149,14 @@
 
 @theme {
   --breakpoint-*: initial;
+}
+
+@keyframes message-highlight {
+  0% { background-color: transparent; }
+  20% { background-color: rgba(99, 102, 241, 0.3); }
+  50% { background-color: rgba(99, 102, 241, 0.15); }
+  75% { background-color: rgba(99, 102, 241, 0.3); }
+  100% { background-color: transparent; }
 }
 
 @custom-variant 2xl (@media (max-width: 1535px));

@@ -20,12 +20,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   const loadUser = async () => {
-    if (!authService.isAuthenticated()) {
-      setUser(null)
-      setIsLoading(false)
-      return
-    }
-
     try {
       const me = await authService.fetchMe()
       setUser(me)

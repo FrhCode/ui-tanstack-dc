@@ -1,11 +1,4 @@
-import { LOCAL_STORAGE_KEY } from '#/constant/localStorage'
-import { localStorageUtil } from '#/util/local-storage.util'
-import axios, {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  InternalAxiosRequestConfig,
-} from 'axios'
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
 
 export type ApiEnvelope<T> = {
   statusCode: number
@@ -14,18 +7,15 @@ export type ApiEnvelope<T> = {
   data: T
 }
 
-export type Tokens = {
-  accessToken: string
-  refreshToken: string
-}
-
 export type ApiErrorResponse = {
   statusCode: number
   message: string
   requestId: string
-  errors?: unknown // keep if your backend sometimes provides it
+  errors?: unknown
 }
 
+// In dev, direct URL is used with withCredentials=true + backend CORS config.
+// In prod, same domain so VITE_API_BASE_URL can be empty or the same origin.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string
 
 export class ApiError extends Error {
@@ -41,54 +31,54 @@ export class ApiError extends Error {
   }
 }
 
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
+
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
 // Main API client
 export const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 })
 
 // Naked client for refresh (no interceptors -> no recursion)
 const refreshClient = axios.create({
   baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+})
+
+// Attach CSRF token for mutating requests
+api.interceptors.request.use((config) => {
+  if (!SAFE_METHODS.has((config.method ?? 'get').toUpperCase())) {
+    const token = getCsrfToken()
+    if (token) {
+      config.headers = config.headers ?? {}
+      config.headers['x-csrf-token'] = token
+    }
+  }
+  return config
 })
 
 const isAuthEndpoint = (url?: string) =>
   !!url && (url.startsWith('/auth/refresh') || url.startsWith('/auth/login'))
 
-let refreshInFlight: Promise<Tokens> | null = null
+let refreshInFlight: Promise<void> | null = null
 
-async function refreshTokens(): Promise<Tokens> {
+async function refreshTokens(): Promise<void> {
   if (refreshInFlight) return refreshInFlight
 
   refreshInFlight = (async () => {
-    const current = localStorageUtil.getItem<Tokens>(
-      LOCAL_STORAGE_KEY.AUTH_TOKENS,
-    )
-    if (!current?.refreshToken) {
-      throw new Error('No refresh token available')
-    }
-
-    // Your refresh endpoint must also follow the envelope format.
-    const res = await refreshClient.post<ApiEnvelope<Tokens>>('/auth/refresh', {
-      refreshToken: current.refreshToken,
-    })
-
-    const tokens: Tokens = {
-      accessToken: res.data.data.accessToken,
-      // eslint-disable-next-line
-      refreshToken: res.data.data.refreshToken ?? current.refreshToken,
-    }
-
-    localStorageUtil.setItem(LOCAL_STORAGE_KEY.AUTH_TOKENS, tokens)
-    return tokens
+    // Cookies are sent automatically — no body needed
+    await refreshClient.post<ApiEnvelope<void>>('/auth/refresh')
   })()
 
   try {
     return await refreshInFlight
-  } catch (e) {
-    localStorageUtil.removeItem(LOCAL_STORAGE_KEY.AUTH_TOKENS)
-    throw e
   } finally {
     refreshInFlight = null
   }
@@ -121,21 +111,6 @@ function toApiError(err: unknown): ApiError {
   })
 }
 
-// Attach access token
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  if (!isAuthEndpoint(config.url)) {
-    const token = localStorageUtil.getItem<Tokens>(
-      LOCAL_STORAGE_KEY.AUTH_TOKENS,
-    )
-    if (token?.accessToken) {
-      // eslint-disable-next-line
-      config.headers = config.headers ?? {}
-      config.headers.Authorization = `Bearer ${token.accessToken}`
-    }
-  }
-  return config
-})
-
 // Refresh on 401, retry once
 api.interceptors.response.use(
   (res) => res,
@@ -154,9 +129,7 @@ api.interceptors.response.use(
     original._retried = true
 
     try {
-      const tokens = await refreshTokens()
-      original.headers = original.headers ?? {}
-      ;(original.headers as any).Authorization = `Bearer ${tokens.accessToken}`
+      await refreshTokens()
       return api.request(original)
     } catch (e) {
       throw toApiError(e)

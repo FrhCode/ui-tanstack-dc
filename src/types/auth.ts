@@ -1,6 +1,4 @@
 export interface AuthResponse {
-  accessToken: string
-  refreshToken: string
   user: AuthUser
 }
 
@@ -21,8 +19,4 @@ export type RegisterPayload = {
   age: number
   email: string
   password: string
-}
-
-export type RefreshPayload = {
-  refreshToken: string
 }
